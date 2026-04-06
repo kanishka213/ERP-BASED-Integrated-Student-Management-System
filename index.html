@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student ERP</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { background: #0f1117; color: white; font-family: 'DM Sans', sans-serif; }
+    .toast-msg { position: fixed; top: 20px; right: 20px; padding: 10px 20px; border-radius: 8px; display: inline-block; z-index: 999; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; color: white; }
+    th { background-color: #1e2030; }
+  </style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="view-login" class="h-screen flex items-center justify-center">
+  <div class="bg-[#1e2030] p-6 rounded-xl w-80 shadow-lg">
+    <h2 class="text-xl font-bold mb-4 text-center">Student ERP Login</h2>
+    <form onsubmit="handleLogin(event)">
+      <input id="login-email" type="email" placeholder="Email" class="w-full p-2 mb-3 rounded text-black" required>
+      <input id="login-pass" type="password" placeholder="Password" class="w-full p-2 mb-3 rounded text-black" required>
+      <button class="w-full bg-indigo-500 p-2 rounded text-white hover:bg-indigo-600">Login</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="view-dashboard" class="hidden p-6">
+
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Dashboard</h1>
+    <button onclick="handleLogout()" class="bg-red-500 px-3 py-1 rounded">Logout</button>
+  </div>
+
+  <!-- NAVBAR -->
+  <div class="flex gap-4 mb-6">
+    <button onclick="switchPage('dashboard')" class="bg-gray-700 px-3 py-1 rounded">Dashboard</button>
+    <button onclick="switchPage('profile')" class="bg-gray-700 px-3 py-1 rounded">Profile</button>
+    <button onclick="switchPage('skills')" class="bg-gray-700 px-3 py-1 rounded">Skills</button>
+    <button onclick="switchPage('documents')" class="bg-gray-700 px-3 py-1 rounded">Documents</button>
+    <button onclick="switchPage('academics')" class="bg-gray-700 px-3 py-1 rounded">Academics</button>
+  </div>
+
+  <!-- ================= DASHBOARD PAGE ================= -->
+  <div id="page-dashboard">
+    <p>Welcome, <span id="dashboard-user"></span> 🎉</p>
+
+    <!-- Admin student list -->
+    <div id="admin-students" class="mt-6 hidden">
+      <h2 class="text-xl font-bold mb-2">All Students</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Roll</th>
+            <th>Department</th>
+            <th>Semester</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="students-table"></tbody>
+      </table>
+    </div>
+
+    <!-- Student info view -->
+    <div id="student-info" class="mt-6">
+      <h2 class="text-xl font-bold mb-2">Student Details</h2>
+      <p><b>Fees Paid:</b> ₹<span id="fee-paid">0</span> / ₹<span id="fee-total">0</span> (Pending: ₹<span id="fee-pending">0</span>)</p>
+
+      <h3 class="mt-4 font-bold">Notices:</h3>
+      <ul id="notices-list" class="list-disc ml-6"></ul>
+
+      <h3 class="mt-4 font-bold">Exam Results:</h3>
+      <ul id="results-list" class="list-disc ml-6"></ul>
+    </div>
+  </div>
+
+  <!-- ================= PROFILE PAGE ================= -->
+  <div id="page-profile" class="hidden">
+    <h2 class="text-xl font-bold mb-2">Profile</h2>
+    <p><b>Name:</b> <span id="profile-name"></span></p>
+    <p><b>Email:</b> <span id="profile-email"></span></p>
+    <p><b>Roll:</b> <span id="profile-roll"></span></p>
+    <p><b>Department:</b> <span id="profile-dept"></span></p>
+    <p><b>Semester:</b> <span id="profile-sem"></span></p>
+  </div>
+
+  <!-- ================= SKILLS PAGE ================= -->
+  <div id="page-skills" class="hidden">
+    <h2 class="text-xl font-bold mb-2">Skills</h2>
+    <form id="form-skills" onsubmit="addSkill(event)">
+      <input id="skill-name" placeholder="Skill" class="text-black p-1 rounded mr-2">
+      <button class="bg-indigo-500 px-3 py-1 rounded">Add</button>
+    </form>
+    <div id="skills-container" class="mt-4"></div>
+  </div>
+
+  <!-- ================= DOCUMENTS PAGE ================= -->
+  <div id="page-documents" class="hidden">
+    <h2 class="text-xl font-bold mb-2">Documents</h2>
+    <form onsubmit="addDocument(event)">
+      <input id="doc-name" placeholder="Document Name" class="text-black p-1 rounded mr-2">
+      <input id="doc-type" placeholder="Type" class="text-black p-1 rounded mr-2">
+      <button class="bg-indigo-500 px-3 py-1 rounded">Add</button>
+    </form>
+    <div id="documents-container" class="mt-4"></div>
+  </div>
+
+  <!-- ================= ACADEMICS PAGE ================= -->
+  <div id="page-academics" class="hidden">
+    <h2 class="text-xl font-bold mb-2">Academics</h2>
+
+    <div class="mt-2">
+      <input id="cgpa-input" type="number" placeholder="Enter CGPA" class="text-black p-1 rounded">
+      <button onclick="updateCGPA()" class="bg-indigo-500 px-3 py-1 rounded ml-2">Update CGPA</button>
+      <p>Current CGPA: <span id="cgpa-value">0</span></p>
+    </div>
+
+    <div class="mt-4">
+      <h3 class="font-bold">Attendance</h3>
+      <input id="subject-name" placeholder="Subject" class="text-black p-1 rounded mr-2">
+      <button onclick="markAttendance(true)" class="bg-green-500 px-3 py-1 rounded">Present</button>
+      <button onclick="markAttendance(false)" class="bg-red-500 px-3 py-1 rounded">Absent</button>
+      <div id="attendance-container" class="mt-2"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toast" class="hidden"></div>
+
+<!-- ================= JS FILES ================= -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/skills.js"></script>
+<script src="js/documents.js"></script>
+<script src="js/academics.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
