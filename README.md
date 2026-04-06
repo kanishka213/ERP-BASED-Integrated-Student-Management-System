@@ -1,6 +1,7 @@
 # ERP-BASED-Integrated-Student-Management-System
 A full-stack Student Management ERP System built using HTML, Tailwind CSS, JavaScript, Node.js, Express, and MongoDB. This platform supports role-based access for both Admin and Students, enabling efficient academic and administrative management.
 Features:
+
 Authentication System-
 Secure login for Admin and Students with role-based dashboards
 Student Dashboard-
@@ -23,4 +24,4 @@ Add and view student documents
 Maintain skill records
 Real-time Updates-
 Data synced with MongoDB
-Dynamic UI rendering
+Dynamic UI rendering.
